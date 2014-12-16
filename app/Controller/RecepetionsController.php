@@ -8,10 +8,13 @@ class ReceptionsController extends AppController
 	$this->loadModel('Order');
 	$this->loadModel('Room');
 	$this->loadModel('User');
-	$this->loadModel('Product');
 
-	public function order()
+	//选菜下单
+	public function order($roomId,$groupBy = null)
 	{
+		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
+		
+		$this->set('Dishs',$re);
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
@@ -32,6 +35,7 @@ class ReceptionsController extends AppController
 				$order['Order']['bill_id'] = $reBill['Bill']['id'];
 				$order['Order']['dish_id'] = $value['dish_id'];
 				$order['Order']['count'] = $value['count'];
+				$order['Order']['status'] = 0;
 				$sum += $value['price'];
 				$this->Order->save($order);
 			}
@@ -40,8 +44,12 @@ class ReceptionsController extends AppController
 		}
 	}
 
+	//追加下单
 	public function addOrder()
 	{
+		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
+		
+		$this->set('Dishs',$re);
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
@@ -56,6 +64,7 @@ class ReceptionsController extends AppController
 				$order['Order']['bill_id'] = $billId;
 				$order['Order']['dish_id'] = $value['dish_id'];
 				$order['Order']['count'] = $value['count'];
+				$order['Order']['status'] = 0;
 				$sum['Bill']['sum'] += $value['price'];
 				$this->Order->save($order);
 			}
@@ -64,15 +73,104 @@ class ReceptionsController extends AppController
 		}
 	}
 
-	public function cancelBill($id)
-	{
-		$this->Bill->delete($id,true);
-	}
-
+	//取消下单
 	public function cancelOrder($id)
 	{
 		$this->Order->delete($id,false);
 	}
+
+	//房台信息
+	public function searchAllRooms()
+	{
+		$re = $this->Room->find('all',array('recursive' => 1));
+		$this->set('Rooms',$re);
+	}
+
+	//单条房台信息（可修改）
+	public function searchRoomByNumber($number)
+	{
+		$re = $this->Room->find('first',array('conditions' => array('Room.number' => $number),'recursive' => 2));
+		
+		$this->set('Room',$re);
+
+		if($this->request->is('post'))
+		{
+			$array = $this->request->data;
+			$this->Room->id = $re['Room']['id'];
+
+			if(!empty($array['number']))
+			{
+				$editData['Room']['number'] = $array['number'];
+			}
+			else
+			{
+				$editData['Room']['number'] = $box['Room']['number'];
+			}
+
+			if(!empty($array['name']))
+			{
+				$editData['Room']['name'] = $array['name'];
+			}
+			else
+			{
+				$editData['Room']['name'] = $box['Room']['name'];
+			}
+
+			if(!empty($array['type']))
+			{
+				$editData['Room']['type'] = $array['type'];
+			}
+			else
+			{
+				$editData['Room']['type'] = $box['Room']['type'];
+			}
+
+			if(!empty($array['status']))
+			{
+				$editData['Room']['status'] = $array['status'];
+			}
+			else
+			{
+				$editData['Room']['status'] = $box['Room']['status'];
+			}
+
+			$this->Room->save($editData);
+		}
+	}
+
+	//账单信息
+	public function searchAllBills()
+	{
+		$re = $this->Bill->find('all',array('recursive' => 1,'order' => 'Bill.time DESC'));
+		$this->set('Bills',$re);
+	}
+
+	//下单信息
+	public function searchOrder($roomId)
+	{
+		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
+		$orders = $this->Order->find('all',array('conditions' => array('Order.bill_id' => $bill['Bill']['id']),'recursive' => 1));
+		$this->set('Orders',$orders);
+	}
+
+	//结账
+	public function checkOut($roomId)
+	{
+		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
+		$this->set('Bill',$bill);
+		if($this->request->is('post'))
+		{
+			$this->Bill->id = $bill['Bill']['id'];
+			$data = $this->request->data;
+			$bill['Bill']['pay_method'] = $data['pay_method'];
+			$bill['Bill']['pay_status'] = $data['pay_status'];
+			$bill['Bill']['pay_sum'] = $data['pay_sum'];
+			$bill['Bill']['pay_change'] = $data['pay_change'];
+			$bill['Bill']['remark'] = $data['remark'];
+			$this->Bill->save($data);
+		}
+	}
+
 }
 
 ?>

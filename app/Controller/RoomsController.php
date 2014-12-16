@@ -12,7 +12,7 @@ class RoomsController extends AppController
 	public function searchById($id)
 	{
 		$re = $this->Room->find('first',array('conditions' => array('Room.id' => $id),'recursive' => 2));
-		
+		debug($re);
 		$this->set('Room',$re);
 	}
 
