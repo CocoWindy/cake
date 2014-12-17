@@ -7,9 +7,11 @@ class ReceptionsController extends AppController
 	$this->loadModel('Drink');
 	$this->loadModel('Order');
 	$this->loadModel('Room');
-	$this->loadModel('User');
+	$this->loadModel('Worker');
 
 	//选菜下单
+	//返回Dishs菜单信息
+	//接受post请求	Dish选菜信息 RoomId房台id	
 	public function order($roomId,$groupBy = null)
 	{
 		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
@@ -45,6 +47,8 @@ class ReceptionsController extends AppController
 	}
 
 	//追加下单
+	//返回Dishs菜单信息
+	//接受post请求 Dish选菜信息 BillId账单id
 	public function addOrder()
 	{
 		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
@@ -80,6 +84,7 @@ class ReceptionsController extends AppController
 	}
 
 	//房台信息
+	//返回Rooms房台信息
 	public function searchAllRooms()
 	{
 		$re = $this->Room->find('all',array('recursive' => 1));
@@ -87,6 +92,8 @@ class ReceptionsController extends AppController
 	}
 
 	//单条房台信息（可修改）
+	//返回Room单条房台信息
+	//接受post请求  房台信息（含修改）
 	public function searchRoomByNumber($number)
 	{
 		$re = $this->Room->find('first',array('conditions' => array('Room.number' => $number),'recursive' => 2));
@@ -138,7 +145,19 @@ class ReceptionsController extends AppController
 		}
 	}
 
+	//换台
+	public function changeRoom($roomOne,$roomTwo)
+	{
+		$re = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomOne),'recursive' => 1,'order' => 'Bill.time DESC'));
+		$this->Bill->id = $re['Bill']['id'];
+		$re['Bill']['room_id'] = $roomTwo;
+		$this->Bill->save($re);
+	}
+
+	//并台
+
 	//账单信息
+	//返回Bills账单信息
 	public function searchAllBills()
 	{
 		$re = $this->Bill->find('all',array('recursive' => 1,'order' => 'Bill.time DESC'));
@@ -146,6 +165,7 @@ class ReceptionsController extends AppController
 	}
 
 	//下单信息
+	//返回Orders下单信息
 	public function searchOrder($roomId)
 	{
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
@@ -153,7 +173,19 @@ class ReceptionsController extends AppController
 		$this->set('Orders',$orders);
 	}
 
+	//做菜
+	public function changeDishesStatus()
+	{
+		if($this->request->is('post'))
+		{
+			$dishes = $this->request->data;
+			$this->Order->saveMany($dishes);
+		}
+	}
+
 	//结账
+	//返回Bill账单信息
+	//接受post请求  账单信息（含修改）
 	public function checkOut($roomId)
 	{
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
