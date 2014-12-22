@@ -2,18 +2,16 @@
 
 class ReceptionsController extends AppController
 {
-	$this->loadModel('Bill');
-	$this->loadModel('Dish');
-	$this->loadModel('Drink');
-	$this->loadModel('Order');
-	$this->loadModel('Room');
-	$this->loadModel('Worker');
 
 	//选菜下单
 	//返回Dishs菜单信息
 	//接受post请求	Dish选菜信息 RoomId房台id	
 	public function order($roomId,$groupBy = null)
 	{
+		$this->loadModel('Dish');
+		$this->loadModel('Bill');
+		$this->loadModel('Order');
+
 		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
 		
 		$this->set('Dishs',$re);
@@ -51,6 +49,10 @@ class ReceptionsController extends AppController
 	//接受post请求 Dish选菜信息 BillId账单id
 	public function addOrder()
 	{
+		$this->loadModel('Dish');
+		$this->loadModel('Bill');
+		$this->loadModel('Order');
+
 		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
 		
 		$this->set('Dishs',$re);
@@ -80,6 +82,7 @@ class ReceptionsController extends AppController
 	//取消下单
 	public function cancelOrder($id)
 	{
+		$this->loadModel('Order');
 		$this->Order->delete($id,false);
 	}
 
@@ -87,6 +90,7 @@ class ReceptionsController extends AppController
 	//返回Rooms房台信息
 	public function searchAllRooms()
 	{
+		$this->loadModel('Room');
 		$re = $this->Room->find('all',array('recursive' => 1));
 		$this->set('Rooms',$re);
 	}
@@ -96,6 +100,7 @@ class ReceptionsController extends AppController
 	//接受post请求  房台信息（含修改）
 	public function searchRoomByNumber($number)
 	{
+		$this->loadModel('Room');
 		$re = $this->Room->find('first',array('conditions' => array('Room.number' => $number),'recursive' => 2));
 		
 		$this->set('Room',$re);
@@ -148,6 +153,7 @@ class ReceptionsController extends AppController
 	//换台
 	public function changeRoom($roomOne,$roomTwo)
 	{
+		$this->loadModel('Bill');
 		$re = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomOne),'recursive' => 1,'order' => 'Bill.time DESC'));
 		$this->Bill->id = $re['Bill']['id'];
 		$re['Bill']['room_id'] = $roomTwo;
@@ -160,6 +166,7 @@ class ReceptionsController extends AppController
 	//返回Bills账单信息
 	public function searchAllBills()
 	{
+		$this->loadModel('Bill');
 		$re = $this->Bill->find('all',array('recursive' => 1,'order' => 'Bill.time DESC'));
 		$this->set('Bills',$re);
 	}
@@ -168,6 +175,8 @@ class ReceptionsController extends AppController
 	//返回Orders下单信息
 	public function searchOrder($roomId)
 	{
+		$this->loadModel('Bill');
+		$this->loadModel('Order');
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
 		$orders = $this->Order->find('all',array('conditions' => array('Order.bill_id' => $bill['Bill']['id']),'recursive' => 1));
 		$this->set('Orders',$orders);
@@ -176,6 +185,7 @@ class ReceptionsController extends AppController
 	//做菜
 	public function changeDishesStatus()
 	{
+		$this->loadModel('Order');
 		if($this->request->is('post'))
 		{
 			$dishes = $this->request->data;
@@ -188,6 +198,7 @@ class ReceptionsController extends AppController
 	//接受post请求  账单信息（含修改）
 	public function checkOut($roomId)
 	{
+		$this->loadModel('Bill');
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
 		$this->set('Bill',$bill);
 		if($this->request->is('post'))

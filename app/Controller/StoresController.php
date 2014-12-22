@@ -11,6 +11,9 @@ class StoresController extends AppController
 	//物资清单 + 取货
 	public function goodsList()
 	{
+		$this->loadModel('StoreRecord');
+		$this->loadModel('Good');
+
 		$re = $this->Good->find('all');
 		$this->set('Goods',$re);
 		if($this->request->is('post'))
@@ -39,6 +42,8 @@ class StoresController extends AppController
 	//记录清单
 	public function recordsList()
 	{
+		$this->loadModel('StoreRecord');
+
 		$re = $this->StoreRecord->find('all',array('recursive' => 1,'order' => 'StoreRecord.time DESC'));
 		$this->set('Records',$re);
 	}
@@ -46,6 +51,8 @@ class StoresController extends AppController
 	//采购清单
 	public function purchaseList()
 	{
+		$this->loadModel('Purchase');
+
 		$re = $this->Purchase->find('all',array('recursive' => 1,'order' => 'Purchase.time DESC'));
 		$this->set('Purchase',$re);
 	}
@@ -53,6 +60,8 @@ class StoresController extends AppController
 	//供应商信息
 	public function supplierList()
 	{
+		$this->loadModel('Supplier');
+
 		$re = $this->Supplier->find('all');
 		$this->set('Suppliers',$re);
 	}
@@ -60,6 +69,9 @@ class StoresController extends AppController
 	//进货
 	public function purchase()
 	{
+		$this->loadModel('Good');
+		$this->loadModel('StoreRecord');
+
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
