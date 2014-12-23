@@ -22,7 +22,7 @@ class ReceptionsController extends AppController
 			$roomId = $data['RoomId'];
 
 			$this->Bill->create();
-			$bill['Bill']['number'] = 0;
+			$bill['Bill']['number'] = ;
 			$bill['Bill']['room_id'] = $room_id;
 			$this->Bill->save($bill);
 

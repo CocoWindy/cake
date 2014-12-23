@@ -2,14 +2,21 @@
 
 class Bill extends AppModel
 {
-	public $belongsTo = array(
-		'Room' => array(
-			'className' => 'Room',
-			'foreignKey' => 'room_id',
+	public $hasMany = array(
+		'Order' => array(
+			'className' => 'Order',
+			'foreignKey' => 'bill_id',
 			'dependent' => true
 		)
 	);
-	
+
+	public $hasOne = array(
+		'Product' => array(
+			'className' => 'Product',
+			'foreignKey' => 'bill_id',
+			'dependent' => true
+		)
+	);
 }
 
 ?>
