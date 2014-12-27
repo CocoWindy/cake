@@ -2,7 +2,7 @@
 
 class Dish extends AppModel
 {
-
+	
 }
 
 ?>
