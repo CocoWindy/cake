@@ -56,9 +56,9 @@ class ReceptionsController extends AppController
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => 'Bill.time DESC'));
 		$order = $this->Order->find('all',array('conditions' => array('Order.bill_id' => $bill['Bill']['id']),'recursive' => 2));
 		
-		
 		$this->set('Dish',$dish);
 		$this->set('Order',$order);
+		debug($order);
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
@@ -104,9 +104,10 @@ class ReceptionsController extends AppController
 	public function searchRoomById($id)
 	{
 		$this->loadModel('Room');
-		$re = $this->Room->find('first',array('conditions' => array('Room.id' => $id),'recursive' => 3));
+		$re = $this->Room->find('first',array('conditions' => array('Room.id' => $id),'recursive' => 2));
 		
 		$this->set('Room',$re);
+		debug($re);
 
 		if($this->request->is('post'))
 		{
