@@ -13,7 +13,7 @@ class ReceptionsController extends AppController
 
 		$re = $this->Dish->find('all',array('recursive' => 1,'group' => $groupBy));
 		//debug($re);
-		$this->set('Dishs',$re);
+		$this->set('Dishes',$re);
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;

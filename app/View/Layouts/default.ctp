@@ -1,4 +1,4 @@
-<?php
+<!--<?php
 /**
  *
  * PHP 5
@@ -58,4 +58,5 @@ $cakeDescription = __d('cake_dev', 'CakePHP: the rapid development php framework
 	</div>
 	<?php echo $this->element('sql_dump'); ?>
 </body>
-</html>
+</html>-->
+<?php echo $this->fetch('content'); ?>
