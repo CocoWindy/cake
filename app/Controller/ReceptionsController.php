@@ -7,6 +7,7 @@ class ReceptionsController extends AppController
 	//接受post请求	Dish选菜信息 RoomId房台id	
 	public function order($roomId,$groupBy = null)
 	{
+		$this->loadModel('Room');
 		$this->loadModel('Dish');
 		$this->loadModel('Bill');
 		$this->loadModel('Order');
@@ -18,28 +19,40 @@ class ReceptionsController extends AppController
 		{
 			$data = $this->request->data;
 			$dishList = $data['Dish'];
-			$roomId = $data['RoomId'];
+			if(!empty($dishList))
+			{
+				$room = $this->Room->find('first',array('conditions' => array('Room.id' => $roomId)));
+				$room['Room']['status'] = 1;
+				$this->Room->id = $room['Room']['id'];
+				$this->Room->save($room);
 
-			$this->Bill->create();
-			$bill['Bill']['number'] = 0;
-			$bill['Bill']['room_id'] = $room_id;
-			$this->Bill->save($bill);
+				$this->Bill->create();
+				$bill['Bill']['number'] = 0;
+				$bill['Bill']['room_id'] = $roomId;
+				$this->Bill->save($bill);
 
-			$bill_id = $this->Bill->id;
+				$bill_id = $this->Bill->id;
 
-			$sum = 0;
-			foreach ($dishList as $key => $value) {
-				$this->Order->create();
-				$order = null;
-				$order['Order']['bill_id'] = $reBill['Bill']['id'];
-				$order['Order']['dish_id'] = $value['dish_id'];
-				$order['Order']['count'] = $value['count'];
-				$order['Order']['status'] = 0;
-				$sum += $value['price'];
-				$this->Order->save($order);
+				$sum = 0;
+				foreach ($dishList as $key => $value) {
+					$this->Order->create();
+					$order = null;
+					$order['Order']['bill_id'] = $reBill['Bill']['id'];
+					$order['Order']['dish_id'] = $value['dish_id'];
+					$order['Order']['count'] = $value['count'];
+					$order['Order']['status'] = 0;
+					$sum += $value['price'];
+					$this->Order->save($order);
+				}
+				$bill['Bill']['sum'] = $sum;
+				$this->Bill->save($bill);
+
+				$this->redirect(array('controller' => 'Receptions','action' => 'searchRoomById/'.$roomId));
 			}
-			$bill['Bill']['sum'] = $sum;
-			$this->Bill->save($bill);
+			else
+			{
+				$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
+			}
 		}
 	}
 
@@ -203,6 +216,9 @@ class ReceptionsController extends AppController
 	public function checkOut($roomId)
 	{
 		$this->loadModel('Bill');
+		$this->loadModel('Room');
+
+		$room = $this->Room->find('first',array('conditions' => array('Room.id' => $roomId),'recursive' => 1));
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => array('Bill.time DESC'),'recursive' => 2));
 		$this->set('Bill',$bill);
 		if($this->request->is('post'))
@@ -215,6 +231,10 @@ class ReceptionsController extends AppController
 			$bill['Bill']['pay_change'] = $data['pay_change'];
 			$bill['Bill']['remark'] = $data['remark'];
 			$this->Bill->save($data);
+
+			$room['Room']['status'] = 0;
+			$this->Room->id = $room['Room']['id'];
+			$this->Room->save($room);
 		}
 	}
 
