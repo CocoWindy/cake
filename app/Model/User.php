@@ -2,14 +2,10 @@
 
 class User extends AppModel
 {
-	public $hasMany = array(
-		'Blog' => array(
-			'className' => 'Blog',
-			'foreignKey' => 'user_id'
-			),
-		'Chat' => array(
-			'className' => 'Chat',
-			'foreignKey' => 'user_id'
+	public $belongsTo = array(
+		'Worker' => array(
+			'className' => 'Worker',
+			'foreignKey' => 'worker_id'
 			)
 		);	
 

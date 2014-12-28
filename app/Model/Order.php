@@ -2,7 +2,7 @@
 
 class Order extends AppModel
 {
-	public $belongTo = array(
+	public $belongsTo = array(
 		'Bill' => array(
 			'className' => 'Bill',
 			'foreignKey' => 'bill_id',

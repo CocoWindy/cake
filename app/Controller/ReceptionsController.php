@@ -104,7 +104,7 @@ class ReceptionsController extends AppController
 	public function searchRoomById($id)
 	{
 		$this->loadModel('Room');
-		$re = $this->Room->find('first',array('conditions' => array('Room.id' => $id),'recursive' => 2));
+		$re = $this->Room->find('first',array('conditions' => array('Room.id' => $id),'recursive' => 3));
 		
 		$this->set('Room',$re);
 		debug($re);
