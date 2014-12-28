@@ -84,7 +84,7 @@ class StoresController extends AppController
 			$remark = $data['remark'];
 
 			$good = $this->Good->find('first',array('conditions' => array('Good.name'=> $name)));
-			var $id;
+			$id = 0;
 			if(empty($good))
 			{
 				$this->Good->create();

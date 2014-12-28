@@ -40,14 +40,39 @@ class MainsController extends AppController
 		{
 			$data = $this->request->data;
 			$box = $this->User->find('first',array(
-					'conditions' => array('username' => $data['User']['username'],'password' => $data['User']['password']),
-					'recursive' => 1
+					'conditions' => array('User.name' => $data['username'],'User.password' => $data['password']),
+					'recursive' => 2
 				)
 			);
 			if(!empty($box))
 			{
 				$User = $this->Session->write('User',$box);	
-				//$this->redirect(array('controller' => 'users','action' => 'personal'));
+				$job_id = $box['Worker']['Job']['id'];
+				switch ($job_id) {
+					case '1':
+					{
+						$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
+						break;
+					}
+					case '2':
+					{
+						$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
+						break;
+					}
+					case '3':
+					{
+						$this->redirect(array('controller' => 'Stores','action' => 'searchAllRooms'));
+						break;
+					}
+					case '4':
+					{
+						$this->redirect(array('controller' => 'Stores','action' => 'searchAllRooms'));
+						break;
+					}
+					default:
+						# code...
+						break;
+				}
 			}
 			else
 			{

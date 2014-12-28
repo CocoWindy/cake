@@ -52,16 +52,16 @@
 </div>
 <div id="navcontainer">
 <ul id="navlist">
-<li><a href="../searchAllRooms"  id="current">查看房台</a></li>
+<li><a href="../searchAllRooms" id="current">查看房台</a></li>
 <li><a href="../searchAllBills" >查看账单</a></li>
 </ul>
 </div>
 <div class = "all">
 	<div class="rightbox">
-			<h2 class="title">请点单</h2>
+			<h2 class="title">请点菜</h2>
 			<form name="input" action="" method="post">
 			<div class = "contentbox1">
-			<table style="position:relative;top:50px;left:40px;width:100%;">
+			<table style="position:relative;top:50px;left:40px;">
 			<thead>
 			<tr>
 			<th>#</th>        
@@ -107,6 +107,43 @@
 		<div>
 		<a href='../searchAllRooms'>返回</a>
 		</div>
+		</div>
+	<div class="contentbox2">
+			<table style="position:absolute;top:50px;left:40px;">
+				<thead>
+				<caption>已点菜单</caption>
+				<br />
+				<br />
+				<tr>
+					<th>#</th>        
+					<th>菜品名称</th>
+					<th>价格</th>
+					<th>数量</th>
+				</tr>
+				</thead>
+				<tfoot>
+				<tr>
+				<td>&nbsp;</td>        
+				<td></td>
+				<td></td>
+				</tr>
+				</tfoot>    
+				<tr>
+				<?php
+					$count = 1;
+					foreach ($Order as $order):
+						echo '<tr>';
+						echo '<td>'.$count.'</td>';
+						echo '<td>'.$order['Dish']["name"].'</td>';
+						echo '<td>'.$order['Dish']["price"].'</td>';
+						echo '<td>'.$order['Order']['count'].'</td>';
+						$count++;
+					endforeach;
+				?>			
+			</table>
+			
+			
+		
 	</div>
 </div>
 </body>

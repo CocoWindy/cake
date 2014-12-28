@@ -52,61 +52,58 @@
 </div>
 <div id="navcontainer">
 <ul id="navlist">
-<li><a href="../searchAllRooms"  id="current">查看房台</a></li>
+<li><a href="../searchAllRooms" id="current">查看房台</a></li>
 <li><a href="../searchAllBills" >查看账单</a></li>
 </ul>
 </div>
 <div class = "all">
 	<div class="rightbox">
-			<h2 class="title">请点单</h2>
-			<form name="input" action="" method="post">
-			<div class = "contentbox1">
-			<table style="position:relative;top:50px;left:40px;width:100%;">
-			<thead>
-			<tr>
-			<th>#</th>        
-			<th>菜品名称</th>
-			<th>价格</th>
-			<th>数量</th>
-			</tr>
-			</thead>
-			<tr>
-			<?php
-				$count = 0;
-				foreach ($Dishes as $dish):
-					echo '<tr>';
-					echo '<td><input type="checkbox" name="Dish['.$count.'][id]" value="'.$dish['Dish']['id'].'+'.$dish['Dish']['price'].'"/></td>'; 
-					echo '<td>'.$dish['Dish']['name'].'</td>';
-					echo '<td>'.$dish['Dish']['price'].'</td>';
-					echo '<td><select name="Dish['.$count.'][count]">
-					<option  value="0">0</option>
-					<option  value="1">1</option>
-					<option  value="2">2</option>
-					<option  value="3">3</option>
-					<option  value="4">4</option>
-					<option  value="5">5</option>
-					<option  value="6">6</option>
-					<option  value="7">7</option>
-					<option  value="8">8</option>
-					<option  value="9">9</option>
-					<option  value="10">10</option></td>';
-					echo '</select>';
-					echo '</tr>';
-					$count++;
-				endforeach;	
-			?>
-			</table>
-			</div>
-			<input style="position:relative; top:90px" type="submit" value="点餐" />
-			</form>
-			
-
+		<h2 class="title">查看房间信息</h2>
+		<div class="contentbox">
+		<form name="input" action  = "" method="post">
+			<table>
+		<caption><?php echo '房间信息'?></caption>
+		<?php
+			echo '<tr>';
+        	echo '<th scope="row">房间名</th>';
+            echo '<td>'.$Room['Room']['name'].'</td>';
+			echo '</tr>';
+			echo '<tr>';
+        	echo '<th scope="row">开房时间</th>';
+            echo '<td>'.$Room['Bill'][0]['time'].'</td>';
+			echo '</tr>';
+			echo '<tr>';
+        	echo '<th scope="row">总费用</th>';
+            echo '<td>'.$Room['Bill'][0]['sum'].'</td>';
+			echo '</tr>';
+			echo '<tr>';
+        	echo '<th scope="row">付款状态</th>';
+			if($Room['Bill'][0]['pay_status'] == 0 )
+            echo '<td>未付款</td>';
+			else
+            echo '<td>已付款</td>';
+			echo '</tr>';
+			echo '<tr>';
+        	echo '<th scope="row">点菜信息</th>';
+            echo '<td>';
+				foreach ($Room['Bill'][0]['Order'] as $key => $value) {
+					echo $value['Dish']['name'].' 数量'.$value['count'].' 单价'.$value['Dish']['price'].'<br>';
+				};
+			echo '<br>';
+			echo '<br>';
+			echo '</td>';
+			echo '</tr>';
+		?>
+		</table>
 		<br>
 		<br>
 		<br>
-		<div>
+		<div style="position:relative">
 		<a href='../searchAllRooms'>返回</a>
 		</div>
+		</div>
+
 	</div>
+
 </div>
 </body>

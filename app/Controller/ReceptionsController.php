@@ -19,6 +19,7 @@ class ReceptionsController extends AppController
 		{
 			$data = $this->request->data;
 			$dishList = $data['Dish'];
+			//debug($dishList);
 			if(!empty($dishList))
 			{
 				$room = $this->Room->find('first',array('conditions' => array('Room.id' => $roomId)));
@@ -35,14 +36,23 @@ class ReceptionsController extends AppController
 
 				$sum = 0;
 				foreach ($dishList as $key => $value) {
-					$this->Order->create();
-					$order = null;
-					$order['Order']['bill_id'] = $reBill['Bill']['id'];
-					$order['Order']['dish_id'] = $value['dish_id'];
-					$order['Order']['count'] = $value['count'];
-					$order['Order']['status'] = 0;
-					$sum += $value['price'];
-					$this->Order->save($order);
+					if(!empty($value['id']))
+					{
+						$pos = strpos($value['id'], '+');
+
+						$id = substr($value['id'], 0 ,$pos);
+						$price = substr($value['id'], $pos+1);
+
+						$this->Order->create();
+						$order = null;
+						$order['Order']['bill_id'] = $bill_id;
+						$order['Order']['dish_id'] = $id;
+						$order['Order']['count'] = $value['count'];
+						$order['Order']['status'] = 0;
+						$sum += $price;
+						$this->Order->save($order);
+					}
+					
 				}
 				$bill['Bill']['sum'] = $sum;
 				$this->Bill->save($bill);
@@ -67,31 +77,38 @@ class ReceptionsController extends AppController
 
 		$dish = $this->Dish->find('all');
 		$bill = $this->Bill->find('first',array('conditions' => array('Bill.room_id' => $roomId),'order' => 'Bill.time DESC'));
-		$order = $this->Order->find('all',array('conditions' => array('Order.bill_id' => $bill['Bill']['id']),'recursive' => 2));
+		$order = $this->Order->find('all',array('conditions' => array('Order.bill_id' => $bill['Bill']['id']),'recursive' => 1));
 		
-		$this->set('Dish',$dish);
+		$this->set('Dishes',$dish);
 		$this->set('Order',$order);
-		debug($order);
+		//debug($order);
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
 			$dishList = $data['Dish'];
-			$billId = $data['BillId'];
 
-			$this->Bill->id = $billId;
-			$sum = $this->Bill->find('first',array('conditions' => array('Bill.id' => $billId),'fields' => array('Bill.sum'),'recursive' => 1));
+			$this->Bill->id = $bill['Bill']['id'];
+			$sum = $bill['Bill']['sum'];
 			foreach ($dishList as $key => $value) {
-				$this->Order->create();
-				$order = null;
-				$order['Order']['bill_id'] = $billId;
-				$order['Order']['dish_id'] = $value['dish_id'];
-				$order['Order']['count'] = $value['count'];
-				$order['Order']['status'] = 0;
-				$sum['Bill']['sum'] += $value['price'];
-				$this->Order->save($order);
+				if(!empty($value['id']))
+				{
+					$pos = strpos($value['id'], '+');
+
+					$id = substr($value['id'], 0 ,$pos);
+					$price = substr($value['id'], $pos+1);
+
+					$this->Order->create();
+					$order = null;
+					$order['Order']['bill_id'] = $bill['Bill']['id'];
+					$order['Order']['dish_id'] = $id;
+					$order['Order']['count'] = $value['count'];
+					$order['Order']['status'] = 0;
+					$sum += $price;
+					$this->Order->save($order);
+				}
 			}
-			$this->Bill->set('sum',$sum['Bill']['sum']);
-			$this->Bill->save();
+			$bill['Bill']['sum'] = $sum;
+			$this->Bill->save($bill);
 		}
 	}
 
@@ -120,7 +137,7 @@ class ReceptionsController extends AppController
 		$re = $this->Room->find('first',array('conditions' => array('Room.id' => $id),'recursive' => 3));
 		
 		$this->set('Room',$re);
-		debug($re);
+		//debug($re);
 
 		if($this->request->is('post'))
 		{
@@ -225,8 +242,9 @@ class ReceptionsController extends AppController
 		{
 			$this->Bill->id = $bill['Bill']['id'];
 			$data = $this->request->data;
+			debug($data);
 			$bill['Bill']['pay_method'] = $data['pay_method'];
-			$bill['Bill']['pay_status'] = $data['pay_status'];
+			$bill['Bill']['pay_status'] = 1;
 			$bill['Bill']['pay_sum'] = $data['pay_sum'];
 			$bill['Bill']['pay_change'] = $data['pay_change'];
 			$bill['Bill']['remark'] = $data['remark'];
