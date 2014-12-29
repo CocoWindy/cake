@@ -13,7 +13,7 @@ class MainsController extends AppController
 		$this->Acl->Aco->save(array('parent_id' => null, 'alias' => 'bill'));
 	}
 
-	public function index()
+	public function allow()
 	{
 		$this->loadModel('Worker');
 		$this->loadModel('Job');
@@ -34,49 +34,59 @@ class MainsController extends AppController
 		$this->loadModel('User');
 		if($this->Session->check('User'))
 		{
+			$user = $this->Session->read('User');
+			$this->set('User',$user);
 			//$this->flash('Please logout first',array('controller' => 'users','action' => 'personal'),3);
 		}
 		if($this->request->is('post'))
 		{
-			$data = $this->request->data;
-			$box = $this->User->find('first',array(
-					'conditions' => array('User.name' => $data['username'],'User.password' => $data['password']),
-					'recursive' => 2
-				)
-			);
-			if(!empty($box))
+			if($this->Session->check('User'))
 			{
-				$User = $this->Session->write('User',$box);	
-				$job_id = $box['Worker']['Job']['id'];
-				switch ($job_id) {
-					case '1':
-					{
-						$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
-						break;
-					}
-					case '2':
-					{
-						$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
-						break;
-					}
-					case '3':
-					{
-						$this->redirect(array('controller' => 'Stores','action' => 'searchAllRooms'));
-						break;
-					}
-					case '4':
-					{
-						$this->redirect(array('controller' => 'Stores','action' => 'searchAllRooms'));
-						break;
-					}
-					default:
-						# code...
-						break;
-				}
+				$this->Session->destroy();
+				$this->redirect(array('controller' => 'Mains','action' => 'login'));
 			}
 			else
 			{
-				$this->Session->setFlash("Username or password error");
+				$data = $this->request->data;
+				$box = $this->User->find('first',array(
+						'conditions' => array('User.name' => $data['username'],'User.password' => $data['password']),
+						'recursive' => 2
+					)
+				);
+				if(!empty($box))
+				{
+					$User = $this->Session->write('User',$box);	
+					$job_id = $box['Worker']['Job']['id'];
+					switch ($job_id) {
+						case '1':
+						{
+							$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
+							break;
+						}
+						case '2':
+						{
+							$this->redirect(array('controller' => 'Receptions','action' => 'searchAllRooms'));
+							break;
+						}
+						case '3':
+						{
+							$this->redirect(array('controller' => 'Stores','action' => 'index'));
+							break;
+						}
+						case '4':
+						{
+							$this->redirect(array('controller' => 'Stores','action' => 'index'));
+							break;
+						}
+						default:
+							# code...
+							break;
+					}
+				}
+				else
+				{
+					$this->Session->setFlash("Username or password error");
+				}
 			}
 		}
 	}

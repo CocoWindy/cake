@@ -85,12 +85,12 @@ table {
 /*----------------------*/
 
 .zebra td, .zebra th {
-    padding: 10px;
-    border-bottom: 1px solid #f2f2f2;    
+    padding: 7px;
+    border-bottom: 1px solid #C7C7C7;    
 }
 
 .zebra tbody tr:nth-child(even) {
-    background: #f5f5f5;
+    background: #CD9B9B;
     -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
     -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
     box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
@@ -101,12 +101,12 @@ table {
     text-shadow: 0 1px 0 rgba(255,255,255,.5); 
     border-bottom: 1px solid #ccc;
     background-color: #eee;
-    background-image: -webkit-gradient(linear, left top, left bottom, from(#f5f5f5), to(#eee));
-    background-image: -webkit-linear-gradient(top, #f5f5f5, #eee);
-    background-image:    -moz-linear-gradient(top, #f5f5f5, #eee);
-    background-image:     -ms-linear-gradient(top, #f5f5f5, #eee);
-    background-image:      -o-linear-gradient(top, #f5f5f5, #eee); 
-    background-image:         linear-gradient(top, #f5f5f5, #eee);
+    background-image: -webkit-gradient(linear, left top, left bottom, from(#CD9B9B), to(#eee));
+    background-image: -webkit-linear-gradient(top, #CD9B9B, #eee);
+    background-image:    -moz-linear-gradient(top, #CD9B9B, #eee);
+    background-image:     -ms-linear-gradient(top, #CD9B9B, #eee);
+    background-image:      -o-linear-gradient(top, #CD9B9B, #eee); 
+    background-image:         linear-gradient(top, #CD9B9B, #eee);
 }
 
 .zebra th:first-child {

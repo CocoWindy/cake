@@ -2,40 +2,34 @@
 
 class StoresController extends AppController
 {
-	// $this->loadModel('Worker');
-	// $this->loadModel('Good');
-	// $this->loadModel('Purchase');
-	// $this->loadModel('StoreRecord');
-	// $this->loadModel('Supplier');
+	public function index()
+	{}
 
-	//物资清单 + 取货
-	public function goodsList()
+	//物资清单
+	public function goodList()
 	{
-		$this->loadModel('StoreRecord');
 		$this->loadModel('Good');
 
 		$re = $this->Good->find('all');
 		$this->set('Goods',$re);
+	}
+
+	public function addGoods()
+	{
+		$this->loadModel('Good');
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
-			$good = $data['Good'];
-			$count = $data['count'];
-			$workerId = $data['workerId'];
-			$remark = $data['remark'];
 
-			$good['Good']['count'] = $good['Good']['count'] - $count;
-			$this->Good->id = $good['Good']['id'];
+			$this->Good->create();
+			$good['Good']['number'] = $data['number'];
+			$good['Good']['name'] = $data['name'];
+			$good['Good']['category'] = $data['category'];
+			$good['Good']['unit'] = $data['unit'];
+			$good['Good']['count'] = 0;
+			$good['Good']['cost'] = 0;
 			$this->Good->save($good);
 
-			$this->StoreRecord->create();
-			$record['StoreRecord']['good_id'] = $good['Good']['id'];
-			$record['StoreRecord']['change_count'] = $count;
-			$record['StoreRecord']['operation'] = 1;
-			$record['StoreRecord']['worker_id'] = $workerId;
-			$record['StoreRecord']['amount'] = $count * $good['Good']['cost'];
-			$record['StoreRecord']['remark'] = $remark;
-			$this->StoreRecord->save($record);
 		}
 	}
 
@@ -72,16 +66,22 @@ class StoresController extends AppController
 		$this->loadModel('Good');
 		$this->loadModel('StoreRecord');
 
+		$re = $this->Good->find('all',array('fields' => ('Good.name')));
+		$this->set('Goods',$re);
+
 		if($this->request->is('post'))
 		{
 			$data = $this->request->data;
-			$name = $data['name'];
 			$count = $data['count'];
+			$choose = $data['choose'];
+			$name = $data['goods'];
 			$amount = $data['amount'];
+			
+			/*$count = $data['count'];
 			$category = $data['category'];
 			$unit = $data['unit'];
 			$workerId = $data['workerId'];
-			$remark = $data['remark'];
+			$remark = $data['remark'];*/
 
 			$good = $this->Good->find('first',array('conditions' => array('Good.name'=> $name)));
 			$id = 0;
@@ -96,10 +96,18 @@ class StoresController extends AppController
 				$this->Good->save($good);
 				$id = $this->Good->id;
 			}
-			else{
+			else
+			{
 				$this->Good->id = $good['Good']['id'];
-				$good['Good']['cost'] = ($good['Good']['count']*$good['Good']['cost'] + $amount)/($good['Good']['count']+$count);
-				$good['Good']['count'] += $count;
+				if($choose == 0)
+				{
+					$good['Good']['count'] -= $count;
+				}
+				else
+				{
+					$good['Good']['cost'] = ($good['Good']['count']*$good['Good']['cost'] + $amount)/($good['Good']['count']+$count);
+					$good['Good']['count'] += $count;
+				}
 				$this->Good->save($good);
 				$id = $this->Good->id;
 			}
@@ -107,11 +115,17 @@ class StoresController extends AppController
 			$this->StoreRecord->create();
 			$record['StoreRecord']['good_id'] = $id;
 			$record['StoreRecord']['change_count'] = $count;
-			$record['StoreRecord']['operation'] = 2;
-			$record['StoreRecord']['worker_id'] = $workerId;
+			$record['StoreRecord']['operation'] = $choose;
+			//$record['StoreRecord']['worker_id'] = $workerId;
+			if(empty($amount))
+			{
+				$amount = 0;
+			}
 			$record['StoreRecord']['amount'] = $amount;
-			$record['StoreRecord']['remark'] = $remark;
+			//$record['StoreRecord']['remark'] = $remark;
 			$this->StoreRecord->save($record);
+
+			$this->redirect(array('controller' => 'Stores','action' => 'goodList'));
 		}
 	}
 }
